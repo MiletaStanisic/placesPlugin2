@@ -21,7 +21,8 @@ class LocationForm extends React.Component {
       image: '',
       actionItems: [],
       categories: [],
-      carousel: []
+      carousel: [],
+      poiChecked: this.props.poiSetting
     };
     let state = Object.assign(model, cloneDeep(this.props.location) || {});
     this.setState(state);
@@ -80,10 +81,22 @@ class LocationForm extends React.Component {
 
   mountMap(address) {
     const { maps } = window.google;
+    const { poiChecked } = this.state;
     let defaultLocation = new maps.LatLng(address.lat, address.lng);
     let mapOptions = {
       zoom: 16,
-      center: defaultLocation
+      center: defaultLocation,
+      styles: [
+        {
+          featureType: "poi.business",
+          elementType: "labels",
+          stylers: [
+            {
+              visibility: poiChecked ? "on" : "off"
+            }
+          ]
+        }
+      ]
     };
     this.map.style.height = '230px';
     this.mapInstance = new maps.Map(this.map, mapOptions);
@@ -260,7 +273,22 @@ class LocationForm extends React.Component {
       },
     },
   }
-
+  onPoiChange = () => {
+    const { address } = this.state;
+    if (document.getElementById('poi-checkbox').checked) {
+      if (address.lat && address.lng) {
+        this.mountMap(address);
+      }
+      console.log("checked", this.state.poiChecked);
+      this.setState({ poiChecked: true });
+    } else {
+      if (address.lat && address.lng) {
+        this.mountMap(address);
+      }
+      console.log("unchecked", this.state.poiChecked);
+      this.setState({ poiChecked: false });
+    }
+  }
   render() {
     const { title, address, description, image, categories, subtitle } = this.state;
 
@@ -305,6 +333,11 @@ class LocationForm extends React.Component {
               </div>
             )) : null }
           </div>
+        </div>
+        
+        <div className="form-group">
+          <label style={{ display: "block" }} htmlFor="poi">Points of interest</label>
+          <input defaultChecked={this.state.poiChecked} id="poi-checkbox" type="checkbox" onClick={this.onPoiChange} />
         </div>
 
         <div className='form-group autocomplete-container'>
