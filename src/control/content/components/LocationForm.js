@@ -22,10 +22,18 @@ class LocationForm extends React.Component {
       actionItems: [],
       categories: [],
       carousel: [],
-      poiChecked: this.props.poiSetting
+      pointsOfInterest: true
     };
     let state = Object.assign(model, cloneDeep(this.props.location) || {});
     this.setState(state);
+
+    // buildfire.datastore.get('poi-setting', function (err, data) {
+    //   if (err)
+    //     console.log('retrieving poi setting failed', err);
+    //   else {
+    //     this.setInitialPoiState(data.data.poiChecked);
+    //   }
+    // })
   }
 
   componentWillUnmount() {
@@ -78,10 +86,12 @@ class LocationForm extends React.Component {
       this.mountMap(this.state.address);
     }
   }
-
+  // setInitialPoiState = (data) => {
+  //   this.setState({ poiChecked: data });
+  // }
   mountMap(address) {
     const { maps } = window.google;
-    const { poiChecked } = this.state;
+    const { pointsOfInterest } = this.state;
     let defaultLocation = new maps.LatLng(address.lat, address.lng);
     let mapOptions = {
       zoom: 16,
@@ -92,7 +102,7 @@ class LocationForm extends React.Component {
           elementType: "labels",
           stylers: [
             {
-              visibility: poiChecked ? "on" : "off"
+              visibility: pointsOfInterest ? "on" : "off"
             }
           ]
         }
@@ -273,21 +283,13 @@ class LocationForm extends React.Component {
       },
     },
   }
-  onPoiChange = () => {
+  onPoiChange = (e) => {
     const { address } = this.state;
-    if (document.getElementById('poi-checkbox').checked) {
-      if (address.lat && address.lng) {
-        this.mountMap(address);
-      }
-      console.log("checked", this.state.poiChecked);
-      this.setState({ poiChecked: true });
-    } else {
-      if (address.lat && address.lng) {
-        this.mountMap(address);
-      }
-      console.log("unchecked", this.state.poiChecked);
-      this.setState({ poiChecked: false });
+    this.setState({ pointsOfInterest: !e.target.checked });
+    if (address.lat && address.lng) {
+      this.mountMap(address);
     }
+    console.log("checked", this.state.pointsOfInterest);
   }
   render() {
     const { title, address, description, image, categories, subtitle } = this.state;
@@ -337,7 +339,7 @@ class LocationForm extends React.Component {
         
         <div className="form-group">
           <label style={{ display: "block" }} htmlFor="poi">Points of interest</label>
-          <input defaultChecked={this.state.poiChecked} id="poi-checkbox" type="checkbox" onClick={this.onPoiChange} />
+          <input defaultChecked={this.state.poiChecked} value={!this.state.poiChecked} id="poi-checkbox" type="checkbox" onClick={this.onPoiChange} />
         </div>
 
         <div className='form-group autocomplete-container'>

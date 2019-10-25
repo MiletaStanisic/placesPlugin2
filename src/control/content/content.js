@@ -14,8 +14,7 @@ class Content extends React.Component {
     this.state = {
       data: {},
       addingLocation: false,
-      editingLocation: false,
-      poiSetting: false
+      editingLocation: false
     };
   }
 
@@ -182,7 +181,7 @@ class Content extends React.Component {
    * @param   {Object} location Location object
    */
   onLocationSubmit(location) {
-    const { data, poiSetting } = this.state;
+    const { data, poiChecked } = this.state;
     data.places = data.places || [];
     location.index = data.places.length;
 
@@ -195,10 +194,10 @@ class Content extends React.Component {
         this.handleSave();
     });
 
-    buildfire.datastore.insert(poiSetting, 'poi-setting', (err, result) => {
-      if (err) return console.error(err);
-      this.handleSave();
-    });
+    // buildfire.datastore.save({ poiChecked }, 'poi-setting', (err,data) => {
+    //   if (err) console.error(err);
+    //   else console.log(data);
+    // });
 
     this.setState({ addingLocation: false });
   }

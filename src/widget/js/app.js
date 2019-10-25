@@ -48,7 +48,8 @@ window.app = {
         sortBy: null,
         categories: [],
         navHistory: [],
-        isBackNav: false
+        isBackNav: false,
+        poiChecked: true
     },
     backButtonInit: () => {
         window.app.goBack = window.buildfire.navigation.onBackButtonClick;
@@ -119,7 +120,15 @@ window.app = {
           };
           loadPage();
         }
+      
+        buildfire.datastore.get('poi-setting',function(err,data){
+          if(err)
+              console.log('retrieving poi setting failed', err);
+          else 
+            window.app.state.poiChecked = data.data.poiChecked;
 
+      });
+      
         buildfire.datastore.get(window.app.settings.placesTag, function(err, results){
           if (err) {
             console.error('datastore.get error', err);
