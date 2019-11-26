@@ -246,23 +246,10 @@ window.app = {
             }
             return 0;
           });
-
-          buildfire.datastore.onUpdate(function (event) {
-            let currentPlaces = window.app.state.places;
-            let newPlaces = event.data && event.data.places ? event.data.places : currentPlaces;
-
-            let updatedPlaces = filter(newPlaces, (newPlace) => { return !find(currentPlaces, newPlace); });
-
-            if (window.app.state.mode === window.app.settings.viewStates.list) {
-              window.mapView.updateMap(updatedPlaces);
-            } else {
-              //Load new items
-              window.listView.updateList(updatedPlaces);
-            }
-            if (window.app.state.mode === window.app.settings.viewStates.list) {
-              window.listView.initList(window.app.state.places);
-            }
-          });
+          window.lazyload();
+          window.listView.sorting(window.app.state.places);
+          window.lazyload();
+          console.log(">>>>>>", window.app.state.places);
         }
       }
     },

@@ -95,12 +95,6 @@ window.filterControl = {
     createControl: (controlDiv, buttons) => {
         let container = document.createElement('div');
         container.className = 'buttonContainer';
-        if (controlDiv) {
-            for (let i = 0; i < controlDiv.childNodes.length; i++) { 
-                let child = controlDiv.childNodes[i];
-                child.parentNode.removeChild(child);
-            }
-        }
         controlDiv.appendChild(container);
         
         buttons.forEach((button) =>{
