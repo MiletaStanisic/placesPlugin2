@@ -46,7 +46,7 @@ window.filterControl = {
             if (typeof place.categories === 'undefined' || place.categories.length === 0) {
                 return true;
             }
-
+            console.log("filtered>>>>>", app.state.filteredPlaces);
             //Does the place include any of the active categories
             let isMatch = place.categories.some(placeCategory => {
                 return activeCategories.includes(placeCategory);
@@ -95,9 +95,14 @@ window.filterControl = {
     createControl: (controlDiv, buttons) => {
         let container = document.createElement('div');
         container.className = 'buttonContainer';
-
+        if (controlDiv) {
+            for (let i = 0; i < controlDiv.childNodes.length; i++) { 
+                let child = controlDiv.childNodes[i];
+                child.parentNode.removeChild(child);
+            }
+        }
         controlDiv.appendChild(container);
-
+        
         buttons.forEach((button) =>{
             let controlButton = document.createElement('div');
             let imageName = (button.name) ? button.name : app.state.mode;

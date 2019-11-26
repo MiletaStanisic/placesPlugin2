@@ -213,7 +213,6 @@ window.app = {
       if (window.app.state.places && window.app.state.location) {
         let { location } = window.app.state;
         let destinations = [];
-
         window.app.state.places.forEach(place => {
           destinations.push(new window.google.maps.LatLng(place.address.lat, place.address.lng));
         });
@@ -229,18 +228,52 @@ window.app = {
             window.app.state.places[index].distance = (Math.round(distance)).toLocaleString() + ' mi';
           }
         });
-
         window.listView.updateDistances(window.app.state.filteredPlaces);
+
+        let currentSortOrder = window.app.state.sortBy;
+
+        if (currentSortOrder === 'distance') {
+          window.app.state.places = window.app.state.places.sort((a, b) => {
+
+            var aDistance = parseInt(a.distance.split(' ')[0].replace(',', ''));
+            var bDistance = parseInt(b.distance.split(' ')[0].replace(',', ''));
+
+            if (aDistance < bDistance) {
+              return -1;
+            }
+            if (aDistance > bDistance) {
+              return 1;
+            }
+            return 0;
+          });
+
+          buildfire.datastore.onUpdate(function (event) {
+            let currentPlaces = window.app.state.places;
+            let newPlaces = event.data && event.data.places ? event.data.places : currentPlaces;
+
+            let updatedPlaces = filter(newPlaces, (newPlace) => { return !find(currentPlaces, newPlace); });
+
+            if (window.app.state.mode === window.app.settings.viewStates.list) {
+              window.mapView.updateMap(updatedPlaces);
+            } else {
+              //Load new items
+              window.listView.updateList(updatedPlaces);
+            }
+            if (window.app.state.mode === window.app.settings.viewStates.list) {
+              window.listView.initList(window.app.state.places);
+            }
+          });
+        }
       }
     },
     gotPlaces(err, places) {
         if(window.app.state.mode === window.app.settings.viewStates.list){
-            window.initList(places, true);
+          window.initList(places, true);
             //We can not pre-init the map, as it needs to be visible
         }
-        else{
-            window.initMap(places, true);
-            window.initList(places);
+        else {
+          window.initMap(places, true);
+          window.initList(places);          
         }
         window.app.gotPieceOfData();
     },

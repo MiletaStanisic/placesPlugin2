@@ -23,44 +23,31 @@ window.listView = {
             window.listView.defaultImage = `${cloudImg.domain}${cloudImg.operations.cdn}/https://pluginserver.buildfire.com/styles/media/holder-16x9.png`;
 
             const listContainer = document.getElementById("listView");
-
+            const listScrollingContainers = document.getElementsByClassName("list-scrolling-container");
+            if (listScrollingContainers.length>0) {
+                for (let i = 0; i < listScrollingContainers.length; i++) {
+                    const listScrollingContainer = listScrollingContainers[i];
+                    for (let j = 0; j < listScrollingContainer.childNodes.length; j++) {
+                        const child = listScrollingContainer.childNodes[j];
+                        child.parentNode.removeChild(child);
+                    }
+                }
+            }
+         
             window.listView.listScrollingContainer = document.createElement('div');
             window.listView.listScrollingContainer.className = 'list-scrolling-container';
-            listContainer.appendChild(window.listView.listScrollingContainer);
-            window.listView.initialized = true;
+            if (typeof (listContainer) != 'undefined' && listContainer != null) {
+                listContainer.appendChild(window.listView.listScrollingContainer);
+                window.listView.initialized = true;
+            }
         }
 
-        if (!window.listView.initialized) {
-            init();
-        }
-
+        init();
         window.lazyload();
 
-        var sortPlaces = [];
-        if (window.app.state.sortBy === 'distance') {
-            var feetPlaces = [];
-            var milesPlaces = [];
-            var noDistanceData = [];
-            places.forEach(place => {
-                if (place.distance) {
-                    if (place.distance.split(' ')[1] === 'ft')
-                        feetPlaces.push(place);
-                    else if (place.distance.split(' ')[1] === 'mi')
-                        milesPlaces.push(place);
-                } else {
-                    noDistanceData.push(place);
-                }
-            });
-            feetPlaces = feetPlaces.sort(window.PlacesSort[window.app.state.sortBy]);
-            milesPlaces = milesPlaces.sort(window.PlacesSort[window.app.state.sortBy]);
-            sortPlaces = feetPlaces.concat(milesPlaces).concat(noDistanceData);
-        } else {
-            sortPlaces = places.sort(window.PlacesSort[window.app.state.sortBy]);
-        }
+        places.forEach((place, index) => {
 
-        sortPlaces.forEach((place, index) => {
-
-            if (!place.address || !place.address.lat || !place.address.lng) {
+            if (!place.address || !place.address.lat || !place.address.lng) {
                 return;
             }
 
@@ -122,8 +109,6 @@ window.listView = {
 
             window.listView.listScrollingContainer.appendChild(listItem);
         });
-
-
         window.lazyload();
     },
     initList: (places) => {
@@ -138,8 +123,11 @@ window.listView = {
     },
     filter(placesToHide, placesToShow) {
         //Hide filtered places
+        console.log("placesToHide<<<<<<", placesToHide);
+        console.log("placesToShow<<<<<<", placesToShow);
         placesToHide.forEach((place) => {
             let divToHide = document.getElementById(`id_${place.id}`);
+            console.log("div to hide", divToHide);
             if(divToHide)
                 divToHide.setAttribute('style', 'display:none !important');
         });
